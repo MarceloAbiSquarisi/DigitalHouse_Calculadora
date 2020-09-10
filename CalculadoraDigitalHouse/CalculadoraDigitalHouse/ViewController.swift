@@ -44,9 +44,16 @@ class ViewController: UIViewController {
     let btMisBackgroudColor: UIColor = .lightGray
     let btMisTextColor: UIColor = .black
     
+    //Variáveis matematicas
+    var operando: Double = 0.00
+    var operador: Double = 0.00
+    var resultado: Double = 0.00
+    
+    //Variáveis de controle
+    var hasComa: Bool = false // Controla se o número já tem uma vírgula
+    var onCalc: Bool = false // Controla se o operador já foi definido
     
     //Result Label
-    //let resultLabelHeight: CGFloat = holder.frame.size.height
     var resultLabel: UILabel = {
        let label = UILabel()
         label.text = "0"
@@ -103,6 +110,7 @@ class ViewController: UIViewController {
             bt.setTitle("\(x+1)" , for: .normal)
             holder.addSubview(bt)
             bt.tag = x + 1
+            bt.addTarget(self, action: #selector(keyPressed), for: .touchUpInside)
             
         }
         
@@ -116,6 +124,7 @@ class ViewController: UIViewController {
                 bt.setTitle("\(x+3)" , for: .normal)
                 holder.addSubview(bt)
                 bt.tag = x + 3
+                bt.addTarget(self, action: #selector(keyPressed), for: .touchUpInside)
                }
         
         // cria e add os botões de 7 a 9
@@ -127,49 +136,80 @@ class ViewController: UIViewController {
             bt.setTitle("\(x+7)" , for: .normal)
             holder.addSubview(bt)
             bt.tag = x + 7
+            bt.addTarget(self, action: #selector(keyPressed), for: .touchUpInside)
         }
         
         // cria e adciona os botoes de operacoes
         for x in 0..<5{
             let bt = BotaoRound(frame: CGRect(x: btSize * 3 , y: holderHeight - (btSize * CGFloat(x + 1)),
                                                                  width: btSize, height: btSize))
-                             bt.backgroundColor = btOperatorsBackgroudColor
-                             bt.setTitleColor(btOperatorsTextColor, for: .normal)
-                             bt.setTitle("\(operacoes[x])" , for: .normal)
-                             holder.addSubview(bt)
-        }
+            bt.backgroundColor = btOperatorsBackgroudColor
+            bt.setTitleColor(btOperatorsTextColor, for: .normal)
+            bt.setTitle("\(operacoes[x])" , for: .normal)
+            holder.addSubview(bt)
+            bt.tag = x + 13
+            bt.addTarget(self, action: #selector(keyPressed), for: .touchUpInside)        }
         
         // cria e adiciona os botoes AC, troca sinal, percentual
         for x in 0..<3{
             let bt = BotaoRound(frame: CGRect(x: btSize * CGFloat(x) , y: holderHeight - (btSize*5),
                                                                   width: btSize, height: btSize))
-                              bt.backgroundColor = btMisBackgroudColor
-                              bt.setTitleColor(btMisTextColor, for: .normal)
-                              bt.setTitle("\(misButtuns[x])" , for: .normal)
-                              holder.addSubview(bt)
+            bt.backgroundColor = btMisBackgroudColor
+            bt.setTitleColor(btMisTextColor, for: .normal)
+            bt.setTitle("\(misButtuns[x])" , for: .normal)
+            holder.addSubview(bt)
+            bt.tag = x + 10
+            bt.addTarget(self, action: #selector(keyPressed), for: .touchUpInside)
+            
         }
-        resultLabel.font = UIFont(name: "Arial", size: holder.frame.size.height * 0.15 ) // define o tamanho de fonte como 15% da tela
+        resultLabel.font = UIFont(name: "Arial", size: holder.frame.size.height * 0.10 ) // define o tamanho de fonte como 15% da tela
         // Define a posição da label como 6 linha e a altura como 20% da tela
         resultLabel.frame = CGRect(x: 0, y: btZero.frame.origin.y - (btSize*6),
                                    width: view.frame.size.width, height: holder.frame.size.height * 0.20)
         holder.addSubview(resultLabel)
         
-        //Action
-        
-        
         
     }// Fim setup keyPad
     
+    // Action que reage ao clique de um botão
     @objc func keyPressed(_ sender: UIButton){
         let tag = sender.tag
         switch tag {
-        case 0...9:
-            resultLabel.text = String(tag)
-        default:
+        case 10: //AC
+            resultLabel.text = "0"
+        case 11: // troca de sinal
+            resultLabel.text = "-" + (resultLabel.text ?? "")
+        case 12: // %
             break
+        case 13...17: // operators
+            operatorPressed(tag: tag)
+        default:
+            numPressed(tag: String(tag))
         }
         
     }
+    
+    // Comportamento referente ao clique em um botão numérico
+    func numPressed(tag: String){
+        if resultLabel.text == "0" {
+                resultLabel.text = tag
+            }
+            else{
+            resultLabel.text = (resultLabel.text ?? "") + tag
+            }
+    }
+    
+    func operatorPressed(tag: Int){
+        switch tag {
+        case 13: // =
+            resultLabel.text = "="
+        default:
+            break
+        
+        }
+    }
+    
+    
     
 }
 
